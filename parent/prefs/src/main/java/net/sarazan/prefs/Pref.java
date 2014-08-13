@@ -20,5 +20,9 @@ public interface Pref<T> {
 
     void put(@Nullable T value, boolean commit);
 
+    void remove(boolean commit);
+
     void commit();
+
+    void revert();
 }

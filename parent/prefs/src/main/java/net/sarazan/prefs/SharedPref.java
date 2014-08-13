@@ -20,7 +20,12 @@ public class SharedPref<T> implements Pref<T> {
     @NotNull
     private final Class<T> mClazz;
 
-    SharedPref(@NotNull String key, @Nullable SharedPreferences sharedPreferences, @NotNull Class<T> clazz) {
+    @Nullable
+    private T mValue;
+
+    private boolean mHasChanged = false;
+
+    public SharedPref(@NotNull String key, @Nullable SharedPreferences sharedPreferences, @NotNull Class<T> clazz) {
         mKey = key;
         mSharedPreferences = sharedPreferences;
         mClazz = clazz;
@@ -38,6 +43,7 @@ public class SharedPref<T> implements Pref<T> {
     @Override
     public T get() {
         if (mSharedPreferences == null) return null;
+        if (mHasChanged) return mValue;
         return Prefs.getGeneric(mSharedPreferences, mKey, mClazz);
     }
 
@@ -54,11 +60,27 @@ public class SharedPref<T> implements Pref<T> {
         if (mEditor == null) {
             mEditor = mSharedPreferences.edit();
         }
+        mHasChanged = !commit;
+        mValue = mHasChanged ? value : null;
         Prefs.putGeneric(mEditor, mKey, value, commit);
     }
 
     @Override
     public void commit() {
         if (mEditor != null) mEditor.commit();
+        mHasChanged = false;
+        mValue = null;
+    }
+
+    @Override
+    public void remove(boolean commit) {
+        put(null, commit);
+    }
+
+    @Override
+    public void revert() {
+        mEditor = null;
+        mHasChanged = false;
+        mValue = null;
     }
 }
