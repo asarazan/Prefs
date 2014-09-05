@@ -1,7 +1,7 @@
 apply plugin: 'com.android.library'
 apply plugin: 'maven'
 
-version = '1.0.12'
+version = '1.0.13'
 group = 'net.sarazan.prefs'
 
 android {
@@ -30,8 +30,6 @@ android {
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
-
-    compile 'org.jetbrains:annotations:13.0'
 }
 
 uploadArchives {

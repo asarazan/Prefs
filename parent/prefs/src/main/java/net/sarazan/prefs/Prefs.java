@@ -4,9 +4,6 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
 /**
  * Created by Aaron Sarazan on 6/22/14
  * Copyright(c) 2014 Manotaur, LLC.
@@ -17,19 +14,18 @@ public final class Prefs {
 
     private Prefs() {}
 
-    @NotNull
-    public static <T> Pref<T> sharedPreference(@NotNull Context c, @NotNull String key, @NotNull Class<T> clazz) {
+    public static <T> Pref<T> sharedPreference(Context c, String key, Class<T> clazz) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(c);
         return new SharedPref<>(key, prefs, clazz);
     }
 
-    public static <T> void putGeneric(@Nullable Context c, @NotNull String key, @Nullable T value, boolean commit) {
+    public static <T> void putGeneric(Context c, String key, T value, boolean commit) {
         if (c == null) return;
         putGeneric(PreferenceManager.getDefaultSharedPreferences(c).edit(), key, value, commit);
     }
 
     // Stores integers as longs, fyi.
-    public static <T> void putGeneric(@Nullable SharedPreferences.Editor editor, @NotNull String key, @Nullable T value, boolean commit) {
+    public static <T> void putGeneric(SharedPreferences.Editor editor, String key, T value, boolean commit) {
         if (editor == null) return;
         if (value == null) {
             editor.remove(key);
@@ -53,14 +49,12 @@ public final class Prefs {
         }
     }
 
-    @Nullable
-    public static <T> T getGeneric(@Nullable Context c, @NotNull String key, @NotNull Class<T> clazz) {
+    public static <T> T getGeneric(Context c, String key, Class<T> clazz) {
         if (c == null) return null;
         return getGeneric(PreferenceManager.getDefaultSharedPreferences(c), key, clazz);
     }
 
-    @Nullable
-    public static <T> T getGeneric(@Nullable SharedPreferences prefs, @NotNull String key, @NotNull Class<T> clazz) {
+    public static <T> T getGeneric(SharedPreferences prefs, String key, Class<T> clazz) {
         if (prefs == null) return null;
         if (!prefs.contains(key)) return null;
         if (clazz == String.class) {
@@ -78,12 +72,12 @@ public final class Prefs {
         }
     }
 
-    public static void remove(@Nullable Context c, @NotNull String key, boolean commit) {
+    public static void remove(Context c, String key, boolean commit) {
         if (c == null) return;
         remove(PreferenceManager.getDefaultSharedPreferences(c), key, commit);
     }
 
-    public static void remove(@Nullable SharedPreferences prefs, @NotNull String key, boolean commit) {
+    public static void remove(SharedPreferences prefs, String key, boolean commit) {
         if (prefs == null) return;
         SharedPreferences.Editor e = prefs.edit();
         e.remove(key);
