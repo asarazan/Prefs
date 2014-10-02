@@ -1,6 +1,12 @@
 package net.sarazan.prefs;
 
+import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
+
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
 * Created by Aaron Sarazan on 6/22/14
@@ -10,44 +16,45 @@ public class SharedPref<T> implements Pref<T> {
 
     private final String mKey;
 
-    private final SharedPreferences mSharedPreferences;
-
     private final Class<T> mClazz;
 
     private T mValue;
 
     private boolean mHasChanged = false;
 
-    public SharedPref( String key,  SharedPreferences sharedPreferences,  Class<T> clazz) {
+    private SharedPreferences.Editor mEditor;
+
+    public SharedPref(String key, Class<T> clazz) {
         mKey = key;
-        mSharedPreferences = sharedPreferences;
         mClazz = clazz;
     }
 
-    private SharedPreferences.Editor mEditor;
-
-    public String getKey() {
+    @NotNull
+    public String getKey(@NotNull Context c) {
         return mKey;
     }
 
     @Override
-    public T get() {
-        if (mSharedPreferences == null) return null;
+    @Nullable
+    public T get(@NotNull Context c) {
         if (mHasChanged) return mValue;
-        return Prefs.getGeneric(mSharedPreferences, mKey, mClazz);
+        return Prefs.getGeneric(getSharedPreferences(c), mKey, mClazz);
     }
 
     @Override
-    public T get( T defaultValue) {
-        T retval = get();
+    @NotNull
+    public T get(@NotNull Context c, @NotNull T defaultValue) {
+        T retval = get(c);
         return retval == null ? defaultValue : retval;
     }
 
     @Override
-    public void put( T value, boolean commit) {
-        if (mSharedPreferences == null) return;
+    @SuppressLint("CommitPrefEdits")
+    public void put(@NotNull Context c, @Nullable T value, boolean commit) {
+        SharedPreferences prefs = getSharedPreferences(c);
+        if (prefs == null) return;
         if (mEditor == null) {
-            mEditor = mSharedPreferences.edit();
+            mEditor = prefs.edit();
         }
         mHasChanged = !commit;
         mValue = mHasChanged ? value : null;
@@ -55,21 +62,27 @@ public class SharedPref<T> implements Pref<T> {
     }
 
     @Override
-    public void commit() {
+    public void commit(@NotNull Context c) {
         if (mEditor != null) mEditor.commit();
         mHasChanged = false;
         mValue = null;
-    }
-
-    @Override
-    public void remove(boolean commit) {
-        put(null, commit);
-    }
-
-    @Override
-    public void revert() {
         mEditor = null;
+    }
+
+    @Override
+    public void remove(@NotNull Context c, boolean commit) {
+        put(c, null, commit);
+    }
+
+    @Override
+    public void revert(@NotNull Context c) {
         mHasChanged = false;
         mValue = null;
+        mEditor = null;
+    }
+
+    @Nullable
+    protected SharedPreferences getSharedPreferences(@NotNull Context c) {
+        return PreferenceManager.getDefaultSharedPreferences(c);
     }
 }

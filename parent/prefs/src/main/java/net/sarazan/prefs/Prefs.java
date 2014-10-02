@@ -14,9 +14,8 @@ public final class Prefs {
 
     private Prefs() {}
 
-    public static <T> Pref<T> sharedPreference(Context c, String key, Class<T> clazz) {
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(c);
-        return new SharedPref<>(key, prefs, clazz);
+    public static <T> Pref<T> sharedPreference(String key, Class<T> clazz) {
+        return new SharedPref<>(key, clazz);
     }
 
     public static <T> void putGeneric(Context c, String key, T value, boolean commit) {
@@ -54,6 +53,7 @@ public final class Prefs {
         return getGeneric(PreferenceManager.getDefaultSharedPreferences(c), key, clazz);
     }
 
+    @SuppressWarnings("unchecked")
     public static <T> T getGeneric(SharedPreferences prefs, String key, Class<T> clazz) {
         if (prefs == null) return null;
         if (!prefs.contains(key)) return null;
