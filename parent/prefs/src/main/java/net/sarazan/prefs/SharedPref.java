@@ -58,7 +58,10 @@ public class SharedPref<T> implements Pref<T> {
         }
         mHasChanged = !commit;
         mValue = mHasChanged ? value : null;
-        Prefs.putGeneric(mEditor, mKey, value, commit);
+        Prefs.putGeneric(mEditor, mKey, value);
+        if (commit) {
+            commit(c);
+        }
     }
 
     @Override
